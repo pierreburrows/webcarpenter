@@ -28,3 +28,10 @@ The site's one job is to get a homeowner on a phone to send an enquiry. Every se
 - `docs/source-project-notes.md`: per-project notes and verbatim captions as supplied
 - `docs/source-reviews.md` and `docs/source-facebook-reviews.png`: reviews as supplied
 - `public/img/projects/<slug>/`: photos, recompressed to max 1600 px, EXIF stripped
+
+## Stage 2 decisions (12 Nov 2026)
+
+- **Type:** Fraunces (variable, optical size and SOFT axes) for display, Inter Tight for body, JetBrains Mono for eyebrows.
+- **Colour:** plaster off-white, charcoal, oak accent. Tokens in `src/app/globals.css`.
+- **Hero:** built from the real slat-media-wall photo, cut into base run, slat panel, tower and tower door, assembling on scroll over Antony's own sketch. Layers in `public/hero/`, timeline in `src/components/Hero.tsx`. Sticky stage plus GSAP ScrollTrigger scrub; Lenis for smooth scroll; reduced-motion shows the finished state.
+- **Generated clip:** one 8 s clip made with Seedance 2.5 from the finished photo (56 credits). Geometry clean, no text, but it is a generic rendered unit, not Antony's (different tower, no fuse-box door, floating base) and came back at 1280x720, not 1080p. Verdict: fails the gate on fidelity and resolution. Not shipped. Kept outside the repo for reference.

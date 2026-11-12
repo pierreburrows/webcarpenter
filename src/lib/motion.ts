@@ -1,17 +1,42 @@
 "use client";
 
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect, type DependencyList } from "react";
 
-let registered = false;
+type Gsap = typeof import("gsap").default;
+type ST = typeof import("gsap/ScrollTrigger").ScrollTrigger;
+export type GsapBundle = { gsap: Gsap; ScrollTrigger: ST };
 
-/** Register GSAP plugins once on the client. Safe to call from any component. */
-export function useGsap() {
-  if (!registered && typeof window !== "undefined") {
-    gsap.registerPlugin(ScrollTrigger);
-    registered = true;
+let bundle: Promise<GsapBundle> | null = null;
+
+/**
+ * GSAP and ScrollTrigger are loaded once, after hydration, with a dynamic import.
+ * Nothing above the fold waits for them: the hero's resting state is plain HTML and CSS.
+ */
+export function loadGsap(): Promise<GsapBundle> {
+  if (!bundle) {
+    bundle = Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(([g, s]) => {
+      g.default.registerPlugin(s.ScrollTrigger);
+      return { gsap: g.default, ScrollTrigger: s.ScrollTrigger };
+    });
   }
-  return { gsap, ScrollTrigger };
+  return bundle;
+}
+
+/** useEffect that runs once GSAP is available. The callback may return a cleanup. */
+export function useGsapEffect(fn: (g: GsapBundle) => void | (() => void), deps: DependencyList) {
+  useEffect(() => {
+    let cleanup: void | (() => void);
+    let cancelled = false;
+    loadGsap().then((g) => {
+      if (cancelled) return;
+      cleanup = fn(g);
+    });
+    return () => {
+      cancelled = true;
+      cleanup?.();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
 }
 
 export function prefersReducedMotion(): boolean {

@@ -1,33 +1,60 @@
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
-import { reviews, site } from "@/lib/site";
+import TrustStrip from "@/components/TrustStrip";
+import FeaturedProjects from "@/components/FeaturedProjects";
+import Process from "@/components/Process";
+import Services from "@/components/Services";
+import ProjectGrid from "@/components/ProjectGrid";
+import About from "@/components/About";
+import Contact from "@/components/Contact";
+import Footer from "@/components/Footer";
+import { site, reviews, services, positioning } from "@/lib/site";
 
 export default function Page() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "@id": `${site.url}/#business`,
+    name: site.name,
+    description: positioning.sub,
+    url: site.url,
+    telephone: "+447710124265",
+    email: site.email,
+    image: `${site.url}/opengraph-image`,
+    // TODO: fill in once Antony confirms the town and area covered.
+    address: { "@type": "PostalAddress", addressCountry: "GB" },
+    areaServed: site.area,
+    priceRange: "££",
+    knowsAbout: services.map((s) => s.name),
+    review: reviews.map((r) => ({
+      "@type": "Review",
+      author: { "@type": "Person", name: r.name },
+      reviewBody: r.text,
+      reviewRating: { "@type": "Rating", ratingValue: 5, bestRating: 5 },
+    })),
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: 5,
+      reviewCount: reviews.length,
+      bestRating: 5,
+    },
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Nav />
       <main className="flex-1">
         <Hero />
-
-        {/* Stage 3 begins here. A plain trust strip so the hero has somewhere to land. */}
-        <section id="work" className="container py-20 md:py-28">
-          <p className="eyebrow text-muted">What customers say</p>
-          <ul className="mt-6 grid gap-6 md:grid-cols-3">
-            {reviews.map((r) => (
-              <li key={r.name} className="rounded-[var(--radius-lg)] border border-line bg-surface p-6">
-                <p className="display text-[1.35rem] leading-snug">“{r.text}”</p>
-                <p className="mt-4 text-sm text-muted">
-                  {r.name} · {r.date} · {r.source}
-                </p>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-10 text-sm text-muted">
-            Remaining sections follow in stage 3. Copy review is at /copy. {site.phone}.
-          </p>
-        </section>
-        <div id="services" /><div id="process" /><div id="about" /><div id="contact" />
+        <TrustStrip />
+        <FeaturedProjects />
+        <Process />
+        <Services />
+        <ProjectGrid />
+        <About />
+        <Contact />
       </main>
+      <Footer />
     </>
   );
 }

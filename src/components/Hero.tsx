@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { positioning, site } from "@/lib/site";
-import { useGsap, prefersReducedMotion, ease } from "@/lib/motion";
+import { useGsapEffect, prefersReducedMotion, ease } from "@/lib/motion";
 
 /*
   The hero is Antony's own oak slat media wall assembling itself as the visitor scrolls.
@@ -43,14 +43,17 @@ const boxStyle = (b: Box) => ({
 });
 
 export default function Hero() {
-  const { gsap, ScrollTrigger } = useGsap();
   const root = useRef<HTMLElement>(null);
   const stage = useRef<HTMLDivElement>(null);
+  // The assembled layers are hidden at load, so their images are only mounted once GSAP is
+  // ready to reveal them. That keeps roughly 80 KB off the first paint's critical path.
+  const [ready, setReady] = useState(false);
 
-  useEffect(() => {
+  useGsapEffect(({ gsap }) => {
     const el = root.current;
     const st = stage.current;
     if (!el || !st) return;
+    setReady(true);
 
     const q = gsap.utils.selector(st);
     const sketch = q("[data-layer=sketch]");
@@ -70,10 +73,9 @@ export default function Hero() {
     }
 
     const ctx = gsap.context(() => {
-      // Resting state on load: the sketch is already there, so the page never opens on an empty stage.
+      // The sketch and the copy are visible from first paint; their entrance is a CSS animation
+      // (see .intro in globals.css) so the LCP never waits for JavaScript.
       gsap.set(sketch, { autoAlpha: 1, scale: 1, transformOrigin: "50% 50%" });
-      gsap.from(sketch, { autoAlpha: 0, y: 18, duration: 1.1, ease: ease.out, delay: 0.15 });
-      gsap.from(el.querySelectorAll("[data-intro]"), { autoAlpha: 0, y: 16, duration: 0.8, ease: ease.out, stagger: 0.08 });
       gsap.set(base, { autoAlpha: 0, y: "60%" });
       gsap.set(slats, { autoAlpha: 0, clipPath: "inset(100% 0 0 0)", y: 24 });
       gsap.set(tower, { autoAlpha: 0, x: "70%" });
@@ -114,7 +116,7 @@ export default function Hero() {
     }, el);
 
     return () => ctx.revert();
-  }, [gsap, ScrollTrigger]);
+  }, []);
 
   return (
     <section
@@ -124,7 +126,7 @@ export default function Hero() {
       className="relative bg-ink text-on-dark"
       style={{ height: "320vh" }}
     >
-      <div className="sticky top-0 flex h-[100svh] flex-col overflow-hidden">
+      <div className="sticky top-0 flex h-[100svh] flex-col overflow-hidden bg-ink">
         {/* subtle plaster grain on charcoal */}
         <div
           aria-hidden
@@ -138,13 +140,13 @@ export default function Hero() {
         <div className="container grid flex-1 grid-rows-[auto_1fr] items-center gap-6 pt-[88px] pb-6 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] md:grid-rows-1 md:gap-10 md:pb-10">
           {/* Copy */}
           <div className="relative z-10 max-w-[34rem]">
-            <p data-intro className="eyebrow text-on-dark-muted">Carpentry &amp; joinery · {site.area}</p>
-            <h1 data-intro className="display mt-4 text-[clamp(2.4rem,7.5vw,5.2rem)]">
+            <p className="intro eyebrow text-on-dark-muted" style={{ animationDelay: "0ms" }}>Carpentry &amp; joinery · {site.area}</p>
+            <h1 className="intro-settle display mt-4 text-[clamp(2.4rem,7.5vw,5.2rem)]" style={{ animationDelay: "80ms" }}>
               Bespoke carpentry for the spaces{" "}
               <span className="display-italic text-oak">off-the-shelf</span> can&apos;t reach.
             </h1>
-            <p data-intro className="lede mt-5 hidden text-on-dark-muted md:block">{positioning.sub}</p>
-            <div data-intro className="mt-6 flex flex-wrap gap-3 md:mt-8">
+            <p className="intro lede mt-5 hidden text-on-dark-muted md:block" style={{ animationDelay: "160ms" }}>{positioning.sub}</p>
+            <div className="intro mt-6 flex flex-wrap gap-3 md:mt-8" style={{ animationDelay: "240ms" }}>
               <a href="#contact" className="btn btn-primary">
                 {positioning.cta}
               </a>
@@ -162,35 +164,36 @@ export default function Hero() {
               style={{ aspectRatio: `${W} / ${H}` }}
             >
               {/* Final photograph: fades in at the end so the room appears around the unit. */}
-              <div data-layer="full" className="absolute inset-0 overflow-hidden rounded-[var(--radius-lg)]">
-                <Image
-                  src="/hero/full.webp"
-                  alt="The finished oak slat media wall: five handleless cupboards, a full-height slat panel and a side tower of shelves"
-                  fill
-                  priority
-                  sizes="(min-width: 768px) 50vw, 100vw"
-                  className="object-cover"
-                />
+              <div data-layer="full" className="layer-hidden absolute inset-0 overflow-hidden rounded-[var(--radius-lg)]">
+                {ready ? (
+                  <Image
+                    src="/hero/full.webp"
+                    alt="The finished oak slat media wall: five handleless cupboards, a full-height slat panel and a side tower of shelves"
+                    fill
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                    className="object-cover"
+                  />
+                ) : null}
               </div>
 
-              <div data-layer="sketch" className="absolute" style={boxStyle(layers.sketch)}>
-                <Image src="/hero/sketch.webp" alt="" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-contain" />
+              <div data-layer="sketch" className="intro-settle absolute mix-blend-screen" style={{ ...boxStyle(layers.sketch), animationDelay: "120ms" }}>
+                <Image src="/hero/sketch.png" alt="" fill priority sizes="(min-width: 768px) 50vw, 100vw" className="object-contain" />
               </div>
 
-              <div data-layer="base" className="absolute" style={boxStyle(layers.base)}>
-                <Image src="/hero/base.webp" alt="" fill sizes="(min-width: 768px) 46vw, 92vw" className="object-cover" />
+              <div data-layer="base" className="layer-hidden absolute" style={boxStyle(layers.base)}>
+                {ready ? <Image src="/hero/base.webp" alt="" fill sizes="(min-width: 768px) 46vw, 92vw" className="object-cover" /> : null}
               </div>
 
-              <div data-layer="slats" className="absolute" style={boxStyle(layers.slats)}>
-                <Image src="/hero/slats.webp" alt="" fill sizes="(min-width: 768px) 38vw, 76vw" className="object-cover" />
+              <div data-layer="slats" className="layer-hidden absolute" style={boxStyle(layers.slats)}>
+                {ready ? <Image src="/hero/slats.webp" alt="" fill sizes="(min-width: 768px) 38vw, 76vw" className="object-cover" /> : null}
               </div>
 
-              <div data-layer="tower" className="absolute" style={boxStyle(layers.tower)}>
-                <Image src="/hero/tower.webp" alt="" fill sizes="10vw" className="object-cover" />
+              <div data-layer="tower" className="layer-hidden absolute" style={boxStyle(layers.tower)}>
+                {ready ? <Image src="/hero/tower.webp" alt="" fill sizes="10vw" className="object-cover" /> : null}
               </div>
 
-              <div data-layer="tower-door" className="absolute" style={boxStyle(layers.towerDoor)}>
-                <Image src="/hero/tower-door.webp" alt="" fill sizes="10vw" className="object-cover" />
+              <div data-layer="tower-door" className="layer-hidden absolute" style={boxStyle(layers.towerDoor)}>
+                {ready ? <Image src="/hero/tower-door.webp" alt="" fill sizes="10vw" className="object-cover" /> : null}
               </div>
             </div>
 

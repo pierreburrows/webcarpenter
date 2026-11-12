@@ -82,13 +82,14 @@ body {
 /* Type scale */
 .display {
   font-family: var(--font-display);
-  font-variation-settings: "opsz" 144, "SOFT" 30;
+  font-variation-settings: "opsz" 144;
   font-weight: 500;
   letter-spacing: -0.02em;
   line-height: 0.98;
   text-wrap: balance;
 }
 .display-italic {
+  font-family: var(--font-fraunces-italic), Georgia, "Times New Roman", serif;
   font-style: italic;
   font-weight: 400;
 }
@@ -133,9 +134,28 @@ body {
 .btn-ghost { color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-strong); }
 .btn-ghost:hover { background: var(--bg-deep); }
 
+/* Hero entrance: pure CSS so the first paint never waits for JavaScript.
+   fill-mode backwards keeps the start state only during the delay, so GSAP can
+   drive opacity afterwards without the animation overriding it. */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.intro { animation: fade-up 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; }
+/* For the headline and the sketch: transform only, never opacity, so the Largest
+   Contentful Paint is counted at first paint rather than at the end of a fade. */
+@keyframes settle {
+  from { transform: translateY(12px); }
+  to   { transform: translateY(0); }
+}
+.intro-settle { animation: settle 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; }
+/* Assembled hero layers start hidden; GSAP reveals them on scroll. Without JS the sketch alone shows. */
+.layer-hidden { opacity: 0; visibility: hidden; }
+
 /* Reduced motion: everything settles immediately. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  .intro, .intro-settle { animation: none; }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;

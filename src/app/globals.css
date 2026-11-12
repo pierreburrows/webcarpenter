@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+/* Stage 1 (copy review): neutral tokens only. The real design system lands in stage 2. */
+:root {
+  --bg: #f6f3ee;
+  --fg: #171412;
+  --surface: #ffffff;
+  --line: rgba(23, 20, 18, 0.12);
+  --accent: #b7772c;
+  --accent-ink: #ffffff;
+  --muted: rgba(23, 20, 18, 0.64);
+  --todo: #b3261e;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-muted: var(--muted);
+  --color-todo: var(--todo);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  overflow-x: clip;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}

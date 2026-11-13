@@ -61,8 +61,8 @@ export default function FeaturedProjects() {
             >
               <Link href={`/work/${p.slug}`} className="block" aria-label={`${p.title}: see the job`}>
                 <div className={`relative overflow-hidden ${tall ? "aspect-[4/5] md:aspect-auto md:h-full md:min-h-[720px]" : "aspect-[4/3]"}`}>
-                  <LazyMount className="absolute -inset-y-[10%] inset-x-0">
-                  <div data-img className="absolute inset-0">
+                  <div data-img className="absolute -inset-y-[10%] inset-x-0">
+                  <LazyMount className="absolute inset-0">
                     <Photo
                       src={hero.src}
                       alt={hero.alt}
@@ -70,8 +70,8 @@ export default function FeaturedProjects() {
                       sizes="(min-width: 768px) 50vw, 100vw"
                       className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                     />
-                  </div>
                   </LazyMount>
+                  </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/20 to-transparent" />
                 </div>
                 <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">

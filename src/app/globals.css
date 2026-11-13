@@ -134,6 +134,20 @@ body {
 .btn-ghost { color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-strong); }
 .btn-ghost:hover { background: var(--bg-deep); }
 
+/* Services list: the row in the middle band of the screen is lit, the rest sit back. */
+.svc-row .svc-dim { opacity: 0.55; transition: opacity 500ms ease; }
+.svc-row .svc-thumb { transform: scale(0.94); filter: saturate(0.6); transition: transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1), filter 600ms ease; }
+.svc-row .svc-arrow { display: inline-block; transition: transform 300ms ease; }
+.svc-row.is-lit .svc-dim { opacity: 1; }
+.svc-row.is-lit .svc-thumb { transform: scale(1); filter: saturate(1); }
+.svc-row:hover .svc-dim { opacity: 1; }
+.svc-row:hover .svc-thumb { transform: scale(1.03); filter: saturate(1); }
+.svc-row:hover .svc-arrow { transform: translateX(4px); }
+@media (prefers-reduced-motion: reduce) {
+  .svc-row .svc-dim { opacity: 1; }
+  .svc-row .svc-thumb { transform: none; filter: none; }
+}
+
 /* Hero entrance: pure CSS so the first paint never waits for JavaScript.
    fill-mode backwards keeps the start state only during the delay, so GSAP can
    drive opacity afterwards without the animation overriding it. */

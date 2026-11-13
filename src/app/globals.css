@@ -163,8 +163,9 @@ body {
   to   { transform: translateY(0); }
 }
 .intro-settle { animation: settle 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; }
-/* Assembled hero layers start hidden; GSAP reveals them on scroll. Without JS the sketch alone shows. */
-.layer-hidden { opacity: 0; visibility: hidden; }
+/* Hero scroll cue: the short rule breathes. */
+@keyframes breathe { 0%, 100% { transform: scaleX(0.4); opacity: 0.5; } 50% { transform: scaleX(1); opacity: 1; } }
+.hero-scroll-line { transform-origin: 0 50%; animation: breathe 2.4s ease-in-out infinite; }
 
 /* Reduced motion: everything settles immediately. */
 @media (prefers-reduced-motion: reduce) {

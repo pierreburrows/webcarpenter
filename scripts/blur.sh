@@ -4,7 +4,7 @@ set -e
 cd "$(dirname "$0")/.."
 echo "{" > src/lib/blur.json
 first=1
-for f in public/img/projects/*/*.jpg public/hero/full.webp; do
+for f in public/img/projects/*/*.jpg public/hero/film-poster.jpg; do
   key="/${f#public/}"
   b64=$(convert "$f" -resize 16x16 -quality 50 jpeg:- | base64 -w0)
   [ $first -eq 1 ] || echo "," >> src/lib/blur.json

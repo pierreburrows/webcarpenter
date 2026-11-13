@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Reveal from "@/components/Reveal";
+import Photo from "@/components/Photo";
 import { contact, site } from "@/lib/site";
 
 type State = "idle" | "sending" | "sent" | "logged" | "error";
@@ -33,19 +34,36 @@ export default function Contact() {
   }
 
   const f = contact.fields;
-  const field = "mt-1 w-full rounded-[var(--radius)] border border-line-strong bg-surface px-3.5 py-3 text-ink placeholder:text-faint focus:border-oak";
+  const field = "glass-field mt-1.5 w-full rounded-[var(--radius)] px-3.5 py-3 text-on-dark placeholder:text-on-dark-muted";
 
   return (
-    <section id="contact" aria-labelledby="contact-heading" className="bg-bg">
-      <Reveal stagger="[data-item]" className="container grid gap-10 py-20 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-16 md:py-28">
+    <section id="contact" aria-labelledby="contact-heading" className="relative overflow-hidden bg-ink text-on-dark">
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <Photo
+          src="/img/projects/staircase-glass-balustrade/03-after-oak-glass-balustrade-understairs-cupboard.jpg"
+          alt=""
+          fill
+          sizes="100vw"
+          quality={60}
+          className="scale-110 object-cover opacity-70 blur-2xl saturate-[1.1]"
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(50% 70% at 80% 20%, rgba(185,131,74,0.45) 0%, rgba(26,22,18,0) 60%), radial-gradient(45% 60% at 10% 90%, rgba(245,241,234,0.2) 0%, rgba(26,22,18,0) 60%), linear-gradient(180deg, rgba(26,22,18,0.4) 0%, rgba(26,22,18,0.65) 100%)",
+          }}
+        />
+      </div>
+      <Reveal stagger="[data-item]" className="container relative grid gap-10 py-20 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-16 md:py-28">
         <div>
-          <p data-item className="eyebrow text-muted">
+          <p data-item className="eyebrow text-on-dark-muted">
             Get a quote
           </p>
           <h2 data-item id="contact-heading" className="display mt-3 text-[clamp(2rem,5vw,3.6rem)]">
             {contact.heading}
           </h2>
-          <p data-item className="lede mt-4 text-muted">
+          <p data-item className="lede mt-4 text-on-dark-muted">
             {contact.sub}
           </p>
           <ul data-item className="mt-8 space-y-3 text-lg">
@@ -62,7 +80,7 @@ export default function Contact() {
           </ul>
         </div>
 
-        <form data-item onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2" noValidate>
+        <form data-item onSubmit={onSubmit} className="glass grid gap-4 rounded-[var(--radius-lg)] p-6 sm:grid-cols-2 md:p-8" noValidate>
           {/* Honeypot */}
           <div className="hidden" aria-hidden>
             <label>
@@ -102,16 +120,16 @@ export default function Contact() {
           </label>
           <label className="block text-sm font-medium sm:col-span-2">
             {f.photo}
-            <input name="photo" type="file" accept="image/*" className={`${field} file:mr-3 file:rounded-full file:border-0 file:bg-bg-deep file:px-3 file:py-1.5 file:text-sm`} />
+            <input name="photo" type="file" accept="image/*" className={`${field} file:mr-3 file:rounded-full file:border-0 file:bg-on-dark/15 file:px-3 file:py-1.5 file:text-sm file:text-on-dark`} />
           </label>
           <div className="sm:col-span-2 flex flex-wrap items-center gap-4">
             <button type="submit" disabled={state === "sending"} className="btn btn-primary disabled:opacity-60">
               {state === "sending" ? "Sending…" : contact.submit}
             </button>
-            <p role="status" aria-live="polite" className="text-sm text-muted">
+            <p role="status" aria-live="polite" className="text-sm text-on-dark-muted">
               {state === "sent" && contact.success}
               {state === "logged" && "Thanks. Your enquiry was received. If you don't hear back within a day, please call."}
-              {state === "error" && <span className="text-[var(--todo,#b3261e)]">{error}</span>}
+              {state === "error" && <span className="text-[#f1a48f]">{error}</span>}
             </p>
           </div>
         </form>
